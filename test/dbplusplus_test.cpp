@@ -11,11 +11,12 @@
 // 	std::vector<std::string> get_keys();
 // 	};
 
-class a: public element{
+class a: public element<std::string, int, float>{
 	public:
 		a(YAML::Node&);
-		a(std::string);
-
+		a(std::string, std::array<std::string, 3>);
+		using element::get;
+		using element::operator[];
 		std::string name; 
 		void parse(std::string);
 		void parse(YAML::Node&);
@@ -31,7 +32,8 @@ a::a(YAML::Node& b){
 
 
 
-a::a(std::string b){
+a::a(std::string b, std::array<std::string, 3> c){
+	this -> keys = c;
 	this -> parse(b);
 	}
 
@@ -62,10 +64,29 @@ YAML::Emitter& a::operator << (YAML::Emitter& b){
 	}
 
 
-
-
+class b: public element<char, int>{
+	public:
+		b(std::string c){}
+		std::string name; 
+		void parse(std::string){}
+		void parse(YAML::Node&){}
+		void print(){printf("name: %s\n", name.c_str());}
+		YAML::Emitter& operator << (YAML::Emitter&){}
+	};
 
 int main(int argc, char *argv[]){
-	a test(argv[1]);
+	a test(argv[1], {"sth", "num", "flt"});
+	// test.keys = {"sth", "num", "flt"};
+	// a::get<0>(test) = "lol";
+	// a::get<1>(test) = 42;
+	// a::get<2>(test) = 69.420;
+	(std::string)test[0] = "lol";
+	// test[1] = 42;
+	// test[2] = 69.420;
+	// test["skill issue"];
+	b rest(argv[1]);
 	test.print();
+	printf("%d\n", test.keys.size());
+	printf("%s\n", a::get<0>(test).c_str());
+	printf("%d\n", rest.keys.size());
 	}
